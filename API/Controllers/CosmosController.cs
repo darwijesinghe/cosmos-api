@@ -107,7 +107,7 @@ namespace API.Controllers
                     return BadRequest("Invalid container name.");
 
                 // retrieves the data
-                var tasks = await _cosmosService.GetTasksAsync<TaskItem>("select * from c", containerName);
+                var tasks = await _cosmosService.GetTasksAsync<TaskItem>("select * from c where is_defined(c.TaskName)", containerName);
                 if (tasks is null || !tasks.Any())
                     return Problem("Required data not found.");
 
@@ -141,7 +141,7 @@ namespace API.Controllers
                     return BadRequest("Invalid container name.");
 
                 // retrieves the data
-                string query = "select c.Assignee, c.TaskName, udf.getDaysLeft(c.Deadline) as DayLeft from c";
+                string query = "select c.Assignee, c.TaskName, udf.getDaysLeft(c.Deadline) as DayLeft from c where is_defined(c.TaskName)";
                 var result   = await _cosmosService.GetTasksAsync(query, containerName);
                 if (result is null || !result.Any())
                     return Problem("Required data not found.");

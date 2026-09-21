@@ -26,37 +26,37 @@ Darshana Wijesinghe
  */
 function bulkInsert(items) {
 
-    // gets the current collection (container)
+    // Gets the current collection (container)
     var collection = getContext().getCollection();
 
-    // gets the response object
+    // Gets the response object
     var response   = getContext().getResponse();
 
-    // if no items are provided, return 0 and exit
+    // If no items are provided, return 0 and exit
     if (!items || !items.length) throw new Error("No data found to insert.");
 
-    var count = 0;              // track the number of successfully inserted items
-    var total = items.length;   // total number of items to insert
+    var count = 0;              // Track the number of successfully inserted items
+    var total = items.length;   // Total number of items to insert
 
-    // loops through all items and attempt to insert them into the collection
+    // Loops through all items and attempt to insert them into the collection
     for (var i = 0; i < total; i++) {
         var isAccepted = collection.createDocument(
-            collection.getSelfLink(),     // reference to the current collection
-            items[i],                     // item to be inserted
-            insertItemCallback            // callback function for result handling
+            collection.getSelfLink(),     // Reference to the current collection
+            items[i],                     // Item to be inserted
+            insertItemCallback            // Callback function for result handling
         );
 
-        // ensures the create document execution was accepted by Cosmos DB
+        // Ensures the create document execution was accepted by Cosmos DB
         if (!isAccepted) throw new Error("Create document execution was not accepted.");
     }
 
-    // callback function to handle the result of each document insertion
+    // Callback function to handle the result of each document insertion
     function insertItemCallback(err, item) {
-        if (err) throw err; // if an error occurs, throw an exception
+        if (err) throw err; // If an error occurs, throw an exception
 
-        count++;            // increment count on successful insertion
+        count++;            // Increment count on successful insertion
 
-        // if all items have been inserted, return the count in response
+        // If all items have been inserted, return the count in response
         if (count >= total) {
             response.setBody(count);
         }
@@ -70,30 +70,30 @@ function bulkInsert(items) {
  */
 function checkSameName(){
 
-    var context    = getContext();               // gets the execution context
-    var request    = context.getRequest();       // gets the request object
-    var collection = context.getCollection();    // gets the document collection
-    var document   = request.getBody();          // gets the document being inserted
+    var context    = getContext();               // Gets the execution context
+    var request    = context.getRequest();       // Gets the request object
+    var collection = context.getCollection();    // Gets the document collection
+    var document   = request.getBody();          // Gets the document being inserted
 
-    // defines the query to check for an existing document with the same email
+    // Defines the query to check for an existing document with the same email
     var query = {
         query     : "SELECT * FROM c WHERE c.Assignee = @assignee",
         parameters: [{ name: "@assignee", value: document.Assignee }]
     };
 
-    // executes the query to check for existing documents
+    // Executes the query to check for existing documents
     var isAccepted = collection.queryDocuments(
-        collection.getSelfLink(), // gets the collection link
-        query,                    // query definition
+        collection.getSelfLink(), // Gets the collection link
+        query,                    // Query definition
         function (err, documents) {
             if (err) throw new Error("Error checking for existing document: " + err.message);
             
-            // if a document with the same email exists, prevent insertion
+            // If a document with the same email exists, prevent insertion
             if (documents.length > 0) throw new Error("A document with the same assignee already exists.");
         }
     );
 
-    // ensures the query execution was accepted by Cosmos DB
+    // Ensures the query execution was accepted by Cosmos DB
     if (!isAccepted) throw new Error("Query execution was not accepted.");
 }
 ```
@@ -104,12 +104,12 @@ function checkSameName(){
  */
 function insertLog(){
 
-    var context     = getContext();             // gets execution context
-    var response    = context.getResponse();    // gets response object
-    var collection  = context.getCollection();  // gets collection object
-    var createdItem = response.getBody();       // gets inserted document
+    var context     = getContext();             // Gets execution context
+    var response    = context.getResponse();    // Gets response object
+    var collection  = context.getCollection();  // Gets collection object
+    var createdItem = response.getBody();       // Gets inserted document
 
-    // creates a log entry
+    // Creates a log entry
     var logEntry = {
         action      : "INSERT",
         documentId  : createdItem.id,
@@ -117,17 +117,17 @@ function insertLog(){
         timestamp   : new Date().toISOString()
     };
 
-    // inserts log entry into 'logs' collection
+    // Inserts log entry into 'logs' collection
     var isAccepted = collection.createDocument(
-        collection.getSelfLink(),                   // gets the collection link
-        logEntry,                                   // log entry
-        { PartitionKey: createdItem.PartitionKey }, // partition key
+        collection.getSelfLink(),                   // Gets the collection link
+        logEntry,                                   // Log entry
+        { PartitionKey: createdItem.PartitionKey }, // Partition key
         function (err, doc) {
             if (err) throw new Error("Log insertion failed: " + err.message);
         }
     );
 
-    // ensures log entry creation was accepted
+    // Ensures log entry creation was accepted
     if (!isAccepted) throw new Error("Log insert request was not accepted.");
 }
 ```
@@ -141,19 +141,19 @@ function insertLog(){
  */
 function getDaysLeft(targetDate) {
     
-    // gets the current date
+    // Gets the current date
     const currentDate    = new Date();
     
-    // parses the target date (assuming targetDate is in YYYY-MM-DD format)
+    // Parses the target date (assuming targetDate is in YYYY-MM-DD format)
     const target         = new Date(targetDate);
     
-    // calculates the difference in time
+    // Calculates the difference in time
     const timeDifference = target - currentDate;
     
-    // converts time difference to days
+    // Converts time difference to days
     const daysLeft       = Math.ceil(timeDifference / (1000 * 3600 * 24)); // 1000 ms * 3600 seconds * 24 hours
     
-    // returns days
+    // Returns days
     return daysLeft;
 }
 ```

@@ -12,31 +12,26 @@ namespace API.Models
         /// The unique ID for the record set
         /// </summary>
         [JsonProperty("id")]
-        public Guid Id             { get; set; } = Guid.NewGuid();
+        public Guid Id              { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// The name of the task
         /// </summary>
-        public string TaskName     { get; set; }
+        public string TaskName      { get; set; }
 
         /// <summary>
         /// The task assignee
         /// </summary>
-        public string Assignee     { get; set; }
+        public string? Assignee     { get; set; }
 
         /// <summary>
         /// The deadline for the task
         /// </summary>
-        public DateTime Deadline   { get; set; }
+        public DateTime? Deadline   { get; set; }
 
         /// <summary>
         /// The partition key for Cosmos DB
         /// </summary>
-        public string PartitionKey { get; set; }
-
-        public TaskItem()
-        {
-            PartitionKey = nameof(Keys.TaskPartitionKey);
-        }
+        public string PartitionKey => nameof(Keys.TaskPartitionKey);
     }
 }
